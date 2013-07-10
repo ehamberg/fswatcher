@@ -42,8 +42,8 @@ main = do
   -- Create an empty MVar and install INT/TERM handlers that will fill it.
   -- We will wait for one of these signals before cleaning up and exiting.
   interrupted <- newEmptyMVar
-  _ <- installHandler sigINT  (Catch $ putMVar interrupted True) Nothing
-  _ <- installHandler sigTERM (Catch $ putMVar interrupted True) Nothing
+  _ <- installHandler sigINT  (Catch $ putMVar interrupted ()) Nothing
+  _ <- installHandler sigTERM (Catch $ putMVar interrupted ()) Nothing
 
   canonicalPath <- canonicalizePath path
 
