@@ -5,9 +5,9 @@ import System.Directory (canonicalizePath)
 import Filesystem.Path (directory)
 import Data.String (fromString)
 import System.FSNotify (Event (..), WatchManager, startManager, stopManager, watchTree, watchDir)
-import System.Exit (exitSuccess, exitFailure)
-import System.Process (createProcess, proc)
-import Control.Monad (void, when)
+import System.Exit (ExitCode (..), exitSuccess, exitFailure)
+import System.Process (createProcess, proc, waitForProcess)
+import Control.Monad (when)
 import System.Posix.Signals (installHandler, Handler(Catch), sigINT, sigTERM)
 import Control.Concurrent.MVar
 
@@ -18,7 +18,11 @@ data FileType = File | Directory deriving Eq
 runCmd :: String -> Event -> IO ()
 runCmd cmd _ = do
   putStrLn $ "Running " ++ cmd
-  void (createProcess (proc cmd [])) -- TODO: get notified when process ends and print "Waiting..."
+  (_, _, _, ph) <- createProcess (proc cmd [])
+  exitCode <- waitForProcess ph
+  hPutStrLn stderr $ case exitCode of
+                       ExitSuccess   -> "Process completed successfully"
+                       ExitFailure n -> "Process completed with exitcode " ++ show n
 
 watch :: FileType -> WatchManager -> String -> String -> IO ()
 watch Directory m path cmd  = watchTree m (fromString path) (const True) (runCmd cmd)
