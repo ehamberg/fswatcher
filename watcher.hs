@@ -34,8 +34,7 @@ main = do
   argv <- getArgs
   when (length argv < 2) $ getProgName >>= usage >> exitFailure
 
-  let path = head argv
-  let cmd  = argv !! 1
+  let [path,cmd]  = take 2 argv
   let args = drop 2 argv
 
   m <- startManager
