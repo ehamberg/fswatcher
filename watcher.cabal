@@ -18,7 +18,6 @@ cabal-version:      >= 1.6
 
 Executable watcher
     build-depends:   base            >=4       && < 5
-                   , cmdargs         >= 0.10   && < 0.11
                    , unix            >= 2.5    && < 2.6
                    , process         >= 1.1    && < 1.2
                    , fsnotify        >= 0.0.4
