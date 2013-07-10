@@ -36,14 +36,14 @@ main = do
 
   m <- startManager
 
-  -- Create an empty MVar and install INT/TERM handlers that will fill it,
-  -- letting us wait for one of these signals before cleaning up and exiting.
+  -- Create an empty MVar and install INT/TERM handlers that will fill it.
+  -- We will wait for one of these signals before cleaning up and exiting.
   interrupted <- newEmptyMVar
   _ <- installHandler sigINT  (Catch $ putMVar interrupted True) Nothing
   _ <- installHandler sigTERM (Catch $ putMVar interrupted True) Nothing
 
   canonicalPath <- canonicalizePath (fspath argv)
-  --
+
   -- check if path is a file or directory
   s <- getFileStatus canonicalPath
   let filetype = if isDirectory s then Directory else File
