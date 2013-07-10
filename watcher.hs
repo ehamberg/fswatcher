@@ -4,30 +4,40 @@ import System.Environment (getArgs, getProgName)
 import System.Directory (canonicalizePath)
 import Filesystem.Path (directory)
 import Data.String (fromString)
-import Data.List (intercalate)
 import System.FSNotify (Event (..), WatchManager, startManager, stopManager, watchTree, watchDir)
 import System.Exit (ExitCode (..), exitSuccess, exitFailure)
 import System.Process (createProcess, proc, waitForProcess)
-import Control.Monad (when)
+import Control.Monad (void, when)
 import System.Posix.Signals (installHandler, Handler(Catch), sigINT, sigTERM)
+import Control.Concurrent (forkIO, killThread)
 import Control.Concurrent.MVar
 
 data FileType = File | Directory deriving Eq
 
-runCmd :: String -> [String] -> Event -> IO ()
-runCmd cmd args _ = do
-  putStrLn $ "Running " ++ cmd ++ " " ++ intercalate " " args ++  "..."
+-- watches a file or directory and whenever a “modified” event is registered
+-- puts a () in the “run” trigger. `tryPutMVar` is used to avoid re-running the
+-- command many times if the file/dir is changed > 1 time while the command is
+-- running.
+watch :: FileType -> WatchManager -> String -> MVar () -> IO ()
+watch filetype m path trigger =
+  let watchFun = case filetype of
+                   Directory -> watchTree m (fromString path) (const True)
+                   File      -> watchDir  m (directory $ fromString path) isThisFile
+   in watchFun (\_ -> void $ tryPutMVar trigger ())
+
+  where isThisFile (Modified p _) = p == fromString path
+        isThisFile _              = False
+
+runCmd :: String -> [String] -> MVar () -> IO ()
+runCmd cmd args trigger = do
+  _ <- takeMVar trigger
+  putStrLn $ "Running " ++ cmd ++ " " ++ unwords args ++  "..."
   (_, _, _, ph) <- createProcess (proc cmd args)
   exitCode <- waitForProcess ph
   hPutStrLn stderr $ case exitCode of
                        ExitSuccess   -> "Process completed successfully"
                        ExitFailure n -> "Process completed with exitcode " ++ show n
-
-watch :: FileType -> WatchManager -> String -> String -> [String] -> IO ()
-watch Directory m path cmd args  = watchTree m (fromString path) (const True) (runCmd cmd args)
-watch File m path cmd args  = watchDir m (directory $ fromString path) isThisFile (runCmd cmd args)
-  where isThisFile (Modified p _) = p == fromString path
-        isThisFile _              = False
+  runCmd cmd args trigger
 
 main :: IO ()
 main = do
@@ -51,13 +61,16 @@ main = do
   s <- getFileStatus canonicalPath
   let filetype = if isDirectory s then Directory else File
 
-  watch filetype m canonicalPath cmd args
+  runTrigger <- newEmptyMVar
+  runThread <- forkIO $ runCmd cmd args runTrigger
+  watch filetype m canonicalPath runTrigger
   putStr $ "Started to watch " ++ path
   putStrLn $ if canonicalPath == path then "" else " [→ " ++ canonicalPath ++ "]"
 
   _ <- readMVar interrupted
   putStrLn "\nStopping."
   stopManager m
+  killThread runThread
   exitSuccess
     where usage n = hPutStrLn stderr $ "Usage: " ++ n
                              ++ " <file/directory to watch>"
