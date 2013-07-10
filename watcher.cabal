@@ -11,18 +11,18 @@ License-file:       LICENSE
 author:             Erlend Hamberg
 maintainer:         ehamberg@gmail.com
 stability:          experimental
-tested-with:        GHC==7.4.2
+tested-with:        GHC==7.6.3
 homepage:           http://www.github.com/ehamberg/watcher/
 cabal-version:      >= 1.6
 
 
 Executable watcher
-    build-depends:   base            >=4       && < 5
-                   , unix            >= 2.5    && < 2.6
-                   , process         >= 1.1    && < 1.2
+    build-depends:   base            >= 4
+                   , unix            >= 2.5
+                   , process         >= 1.1
                    , fsnotify        >= 0.0.4
-                   , system-filepath >= 0.4    && < 0.5
-                   , directory       >= 1.1    && < 1.2
+                   , system-filepath >= 0.4
+                   , directory       >= 1.2
     ghc-options:     -Wall
     main-is:         watcher.hs
 
