@@ -12,4 +12,4 @@ BSDs, and Windows (untested).
 
 Usage:
 
-    watcher <file/directory to watch> <command to run>
+    watcher <file/directory to watch> <command to run> [arguments to command]
