@@ -1,9 +1,9 @@
-                                   _       _
-                         _ _ _ ___| |_ ___| |_ ___ ___
-                        | | | | .'|  _|  _|   | -_|  _|
-                        |_____|__,|_| |___|_|_|___|_|
+                     ___               _       _
+                    |  _|___ _ _ _ ___| |_ ___| |_ ___ ___
+                    |  _|_ -| | | | .'|  _|  _|   | -_|  _|
+                    |_| |___|_____|__,|_| |___|_|_|___|_|
 
-`watcher` monitors a file or a directory for changes and runs a given command
+`fswatcher` monitors a file or a directory for changes and runs a given command
 when the file is modified. If monitoring a directory, it runs the specified
 command a file within the given directory is modified.
 
