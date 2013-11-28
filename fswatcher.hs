@@ -66,6 +66,7 @@ main = do
   watch filetype m canonicalPath runTrigger
   putStr $ "Started to watch " ++ path
   putStrLn $ if canonicalPath == path then "" else " [→ " ++ canonicalPath ++ "]"
+  putStr "Press ^C to exit."
 
   _ <- readMVar interrupted
   putStrLn "\nStopping."
