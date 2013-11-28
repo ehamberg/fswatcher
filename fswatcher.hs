@@ -1,8 +1,8 @@
 import System.IO (hPutStrLn, stderr)
 import System.Posix.Files (getFileStatus, isDirectory)
 import System.Environment (getArgs, getProgName)
-import System.Directory (canonicalizePath)
-import Filesystem.Path (directory)
+import System.Directory (canonicalizePath, getCurrentDirectory)
+import Filesystem.Path ((</>), directory)
 import Data.String (fromString)
 import System.FSNotify (Event (..), WatchManager, startManager, stopManager, watchTree, watchDir)
 import System.Exit (ExitCode (..), exitSuccess, exitFailure)
@@ -64,9 +64,16 @@ main = do
   runTrigger <- newEmptyMVar
   runThread <- forkIO $ runCmd cmd args runTrigger
   watch filetype m canonicalPath runTrigger
+
+  -- Calculate the full path in order to print the "real" file when watching a
+  -- path with one or more symlinks.
+  currDir <- getCurrentDirectory
+  let fullPath = fromString currDir </> fromString path
   putStr $ "Started to watch " ++ path
-  putStrLn $ if canonicalPath == path then "" else " [→ " ++ canonicalPath ++ "]"
-  putStr "Press ^C to exit."
+  putStrLn $ if fromString canonicalPath == fullPath
+                then ""
+                else " (→ " ++ canonicalPath ++ ")"
+  putStrLn "Press ^C to exit."
 
   _ <- readMVar interrupted
   putStrLn "\nStopping."
