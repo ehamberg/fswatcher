@@ -14,10 +14,10 @@ import Control.Concurrent.MVar
 
 data FileType = File | Directory deriving Eq
 
--- watches a file or directory and whenever a “modified” event is registered
--- puts a () in the “run” trigger. `tryPutMVar` is used to avoid re-running the
--- command many times if the file/dir is changed > 1 time while the command is
--- running.
+-- Watches a file or directory and whenever a “modified” event is registered we
+-- put () in the MVar that acts as a run trigger. `tryPutMVar` is used to avoid
+-- re-running the command many times if the file/dir is changed more than once
+-- while the command is already running.
 watch :: FileType -> WatchManager -> String -> MVar () -> IO ()
 watch filetype m path trigger =
   let watchFun = case filetype of
@@ -57,7 +57,7 @@ main = do
 
   canonicalPath <- canonicalizePath path
 
-  -- check if path is a file or directory
+  -- Check if path is a file or directory.
   s <- getFileStatus canonicalPath
   let filetype = if isDirectory s then Directory else File
 
