@@ -37,7 +37,7 @@ runCmd cmd args trigger = do
   exitCode <- waitForProcess ph
   hPutStrLn stderr $ case exitCode of
                        ExitSuccess   -> "Process completed successfully"
-                       ExitFailure n -> "Process completed with exitcode " ++ show n
+                       ExitFailure n -> "Process returned " ++ show n
   runCmd cmd args trigger
 
 main :: IO ()
@@ -74,7 +74,7 @@ main = do
   putStrLn $ if fromString canonicalPath == fullPath
                 then ""
                 else " (→ " ++ canonicalPath ++ ")"
-  putStrLn "Press ^C to exit."
+  putStrLn "Press ^C to stop."
 
   _ <- readMVar interrupted
   putStrLn "\nStopping."
