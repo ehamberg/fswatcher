@@ -4,7 +4,8 @@ import System.Environment (getArgs, getProgName)
 import System.Directory (canonicalizePath, getCurrentDirectory)
 import Filesystem.Path ((</>), directory)
 import Data.String (fromString)
-import System.FSNotify (Event (..), WatchManager, startManager, stopManager, watchTree, watchDir)
+import System.FSNotify (Event (..), StopListening, WatchManager, startManager,
+       stopManager, watchTree, watchDir)
 import System.Exit (ExitCode (..), exitSuccess, exitFailure)
 import System.Process (createProcess, proc, waitForProcess)
 import Control.Monad (void, when)
@@ -18,7 +19,7 @@ data FileType = File | Directory deriving Eq
 -- put () in the MVar that acts as a run trigger. `tryPutMVar` is used to avoid
 -- re-running the command many times if the file/dir is changed more than once
 -- while the command is already running.
-watch :: FileType -> WatchManager -> String -> MVar () -> IO ()
+watch :: FileType -> WatchManager -> String -> MVar () -> IO StopListening
 watch filetype m path trigger =
   let watchFun = case filetype of
                    Directory -> watchTree m (fromString path) (const True)
@@ -63,7 +64,7 @@ main = do
 
   runTrigger <- newEmptyMVar
   runThread <- forkIO $ runCmd cmd args runTrigger
-  watch filetype m canonicalPath runTrigger
+  stopWatcher <- watch filetype m canonicalPath runTrigger
 
   -- Calculate the full path in order to print the "real" file when watching a
   -- path with one or more symlinks.
@@ -77,6 +78,7 @@ main = do
 
   _ <- readMVar interrupted
   putStrLn "\nStopping."
+  stopWatcher
   stopManager m
   killThread runThread
   exitSuccess

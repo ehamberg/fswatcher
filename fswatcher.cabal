@@ -20,7 +20,7 @@ Executable fswatcher
     build-depends:   base            >= 4 && < 5
                    , unix            >= 2.5
                    , process         >= 1.1
-                   , fsnotify        >= 0.0.4
+                   , fsnotify        >= 0.1
                    , system-filepath >= 0.4
                    , directory       >= 1.2
     ghc-options:     -Wall
