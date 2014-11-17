@@ -3,7 +3,7 @@
                     |  _|_ -| | | | .'|  _|  _|   | -_|  _|
                     |_| |___|_____|__,|_| |___|_|_|___|_|
 
-[![Build Status](https://travis-ci.org/ehamberg/simpleea.png)](https://travis-ci.org/ehamberg/simpleea)
+[![Build Status](https://travis-ci.org/ehamberg/fswatcher.png)](https://travis-ci.org/ehamberg/fswatcher)
 
 `fswatcher` monitors a file or a directory for changes and runs a given command
 when the file is modified. If monitoring a directory, it runs the specified
