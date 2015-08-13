@@ -3,6 +3,7 @@ import System.Posix.Files (getFileStatus, isDirectory)
 import System.Environment (getArgs, getProgName)
 import System.Directory (canonicalizePath, getCurrentDirectory)
 import Filesystem.Path ((</>), directory)
+import Filesystem.Path.CurrentOS (decodeString, encodeString)
 import Data.String (fromString)
 import System.FSNotify (Event (..), StopListening, WatchManager, startManager,
        stopManager, watchTree, watchDir)
@@ -22,8 +23,8 @@ data FileType = File | Directory deriving Eq
 watch :: FileType -> WatchManager -> String -> MVar () -> IO StopListening
 watch filetype m path trigger =
   let watchFun = case filetype of
-                   Directory -> watchTree m (fromString path) (const True)
-                   File      -> watchDir  m (directory $ fromString path) isThisFile
+                   Directory -> watchTree m path (const True)
+                   File      -> watchDir  m (encodeString $ directory $ decodeString path) isThisFile
    in watchFun (\_ -> void $ tryPutMVar trigger ())
 
   where isThisFile (Modified p _) = p == fromString path
