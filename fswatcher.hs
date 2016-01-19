@@ -2,16 +2,15 @@
 
 import System.IO (hPutStrLn, stderr)
 import System.Posix.Files (getFileStatus, isDirectory)
-import System.Environment (getArgs, getProgName)
 import System.Directory (canonicalizePath, getCurrentDirectory)
 import Filesystem.Path ((</>), directory)
 import Filesystem.Path.CurrentOS (decodeString, encodeString)
 import Data.String (fromString)
 import System.FSNotify (Event (..), StopListening, WatchManager, startManager,
        stopManager, watchTree, watchDir, eventPath)
-import System.Exit (ExitCode (..), exitSuccess, exitFailure)
+import System.Exit (ExitCode (..), exitSuccess)
 import System.Process (createProcess, proc, waitForProcess)
-import Control.Monad (void, when)
+import Control.Monad (void)
 import System.Posix.Signals (installHandler, Handler(Catch), sigINT, sigTERM)
 import Control.Concurrent (forkIO, killThread)
 import Control.Concurrent.MVar
