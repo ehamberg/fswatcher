@@ -1,3 +1,5 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 import System.IO (hPutStrLn, stderr)
 import System.Posix.Files (getFileStatus, isDirectory)
 import System.Environment (getArgs, getProgName)
@@ -6,13 +8,17 @@ import Filesystem.Path ((</>), directory)
 import Filesystem.Path.CurrentOS (decodeString, encodeString)
 import Data.String (fromString)
 import System.FSNotify (Event (..), StopListening, WatchManager, startManager,
-       stopManager, watchTree, watchDir)
+       stopManager, watchTree, watchDir, eventPath)
 import System.Exit (ExitCode (..), exitSuccess, exitFailure)
 import System.Process (createProcess, proc, waitForProcess)
 import Control.Monad (void, when)
 import System.Posix.Signals (installHandler, Handler(Catch), sigINT, sigTERM)
 import Control.Concurrent (forkIO, killThread)
 import Control.Concurrent.MVar
+import Text.Regex.PCRE
+import Options.Applicative
+
+import Opts
 
 data FileType = File | Directory deriving Eq
 
@@ -20,15 +26,22 @@ data FileType = File | Directory deriving Eq
 -- put () in the MVar that acts as a run trigger. `tryPutMVar` is used to avoid
 -- re-running the command many times if the file/dir is changed more than once
 -- while the command is already running.
-watch :: FileType -> WatchManager -> String -> MVar () -> IO StopListening
-watch filetype m path trigger =
+watch :: FileType -> WatchManager -> String -> MVar () -> WatchOpt -> IO StopListening
+watch filetype m path trigger opt =
   let watchFun = case filetype of
-                   Directory -> watchTree m path (const True)
+                   Directory -> watchTree m path (matchFiles opt)
                    File      -> watchDir  m (encodeString $ directory $ decodeString path) isThisFile
    in watchFun (\_ -> void $ tryPutMVar trigger ())
 
   where isThisFile (Modified p _) = p == fromString path
         isThisFile _              = False
+        matchFiles :: WatchOpt -> Event -> Bool
+        matchFiles wo event = let p = eventPath event
+                                  includes = includePath wo
+                                  excludes = excludePath wo
+                              in
+                                (null includes || p =~ includePath wo)
+                                && (null excludes || not (p =~ excludePath wo))
 
 runCmd :: String -> [String] -> MVar () -> IO ()
 runCmd cmd args trigger = do
@@ -41,13 +54,12 @@ runCmd cmd args trigger = do
                        ExitFailure n -> "Process returned " ++ show n
   runCmd cmd args trigger
 
-main :: IO ()
-main = do
-  argv <- getArgs
-  when (length argv < 2) $ getProgName >>= usage >> exitFailure
+runWatch :: WatchOpt -> IO ()
+runWatch opt = do
 
-  let [path,cmd]  = take 2 argv
-  let args = drop 2 argv
+  let path = watchPath opt
+  let cmd = head $ actionCmd opt
+  let args = drop 1 $ actionCmd opt
 
   m <- startManager
 
@@ -65,7 +77,7 @@ main = do
 
   runTrigger <- newEmptyMVar
   runThread <- forkIO $ runCmd cmd args runTrigger
-  stopWatcher <- watch filetype m canonicalPath runTrigger
+  stopWatcher <- watch filetype m canonicalPath runTrigger opt
 
   -- Calculate the full path in order to print the "real" file when watching a
   -- path with one or more symlinks.
@@ -83,6 +95,10 @@ main = do
   stopManager m
   killThread runThread
   exitSuccess
-    where usage n = hPutStrLn stderr $ "Usage: " ++ n
-                             ++ " <file/directory to watch>"
-                             ++ " <command to run> [arguments for command]"
+
+main :: IO ()
+main = execParser opts >>= runWatch
+  where
+    opts = info (helper <*> watchOpt)
+      ( fullDesc
+     <> progDesc "monitors a file or a directory for changes and runs a given command.")
