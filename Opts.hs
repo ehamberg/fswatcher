@@ -5,6 +5,7 @@ import           Options.Applicative
 data WatchOpt = WatchOpt { watchPath   :: String
                          , includePath :: String  -- ^ an reg exp to include particular files when watching dir
                          , excludePath :: String  -- ^ an reg exp to exclude particular files when watching dir
+                         , throttlingDelay :: Int     -- ^ milliseconds to wait for duplicate events
                          , actionCmd   :: [String]
                          } deriving (Show)
 
@@ -21,5 +22,9 @@ watchOpt = WatchOpt
                     <> value []
                     <> metavar "EXCLUDE"
                     <> help "pattern for excluding files")
+     <*> option auto (long "throttle"
+                    <> value 0
+                    <> metavar "MILLIS"
+                    <> help "milliseconds to wait for duplicate events")
      <*> (many . strArgument) (metavar "COMMAND"
                       <> help "command to run" )

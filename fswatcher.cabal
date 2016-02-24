@@ -27,6 +27,8 @@ Executable fswatcher
                    , regex-pcre-builtin   >= 0.94
     ghc-options:     -Wall
     main-is:         fswatcher.hs
+    other-modules:   Opts
+                   , Pipeline
 
 source-repository head
   type:     git

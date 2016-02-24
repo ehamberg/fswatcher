@@ -1,5 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 
+import Prelude hiding (id, (.))
+
 import System.IO (hPutStrLn, stderr)
 import System.Posix.Files (getFileStatus, isDirectory)
 import System.Directory (canonicalizePath, getCurrentDirectory)
@@ -10,6 +12,7 @@ import System.FSNotify (Event (..), StopListening, WatchManager, startManager,
        stopManager, watchTree, watchDir, eventPath)
 import System.Exit (ExitCode (..), exitSuccess)
 import System.Process (createProcess, proc, waitForProcess)
+import Control.Category
 import Control.Monad (void)
 import System.Posix.Signals (installHandler, Handler(Catch), sigINT, sigTERM)
 import Control.Concurrent (forkIO, killThread)
@@ -18,6 +21,7 @@ import Text.Regex.PCRE
 import Options.Applicative
 
 import Opts
+import Pipeline
 
 data FileType = File | Directory deriving Eq
 
@@ -74,9 +78,16 @@ runWatch opt = do
   s <- getFileStatus canonicalPath
   let filetype = if isDirectory s then Directory else File
 
-  runTrigger <- newEmptyMVar
-  runThread <- forkIO $ runCmd cmd args runTrigger
-  stopWatcher <- watch filetype m canonicalPath runTrigger opt
+  -- Check if throttling was requested.
+  let delay = throttlingDelay opt
+  let pipeline = if delay > 0 then throttle delay else id
+
+  inputMVar <- newEmptyMVar
+  (pipelineThreads, outputMVar) <- runPipeline pipeline inputMVar
+  runThread <- forkIO $ runCmd cmd args outputMVar
+  stopWatcher <- watch filetype m canonicalPath inputMVar opt
+  
+  let allThreads = runThread : pipelineThreads
 
   -- Calculate the full path in order to print the "real" file when watching a
   -- path with one or more symlinks.
@@ -92,7 +103,7 @@ runWatch opt = do
   putStrLn "\nStopping."
   stopWatcher
   stopManager m
-  killThread runThread
+  mapM_ killThread allThreads
   exitSuccess
 
 main :: IO ()
