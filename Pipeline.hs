@@ -4,7 +4,7 @@ module Pipeline where
 import Prelude hiding (id, (.))
 
 import Control.Category
-import Control.Concurrent
+import Control.Concurrent (ThreadId, forkIO, threadDelay)
 import Control.Concurrent.MVar
 import Control.Monad
 
@@ -31,3 +31,20 @@ mkPipeline f = Pipeline $ \inputMVar -> do
       y <- f x
       putMVar outputMVar y
     return ([threadId], outputMVar)
+
+
+-- ignore duplicate events, defined as events closer than 'delay'
+-- milliseconds apart
+throttle :: Int -> Pipeline () ()
+throttle delay = Pipeline $ \inputMVar -> do
+    intermediateMVar <- newEmptyMVar
+    outputMVar <- newEmptyMVar
+    absorberThreadId <- forkIO $ forever $ do
+      () <- takeMVar inputMVar
+      void $ tryPutMVar intermediateMVar () -- don't block if the next thread is sleeping
+    sleepingThreadId <- forkIO $ forever $ do
+      () <- takeMVar intermediateMVar
+      threadDelay (1000 * delay)
+      _ <- tryTakeMVar intermediateMVar -- drop any event received while sleeping
+      putMVar outputMVar ()
+    return ([absorberThreadId, sleepingThreadId], outputMVar)
