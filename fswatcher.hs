@@ -18,6 +18,7 @@ import Text.Regex.PCRE
 import Options.Applicative
 
 import Opts
+import Pipeline
 
 data FileType = File | Directory deriving Eq
 
