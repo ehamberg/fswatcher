@@ -15,4 +15,4 @@ Linux, OS X and other BSDs, and Windows (untested).
 
 Usage:
 
-    watcher <file/directory to watch> <command to run> [arguments to command]
+    fswatcher --path <file/directory to watch> <command to run> [arguments to command]
