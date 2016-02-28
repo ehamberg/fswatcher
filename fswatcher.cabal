@@ -26,6 +26,7 @@ Executable fswatcher
                    , optparse-applicative >= 0.11
                    , regex-pcre-builtin   >= 0.94
     ghc-options:     -Wall
+    hs-source-dirs:  src
     main-is:         fswatcher.hs
     other-modules:   Opts
                    , Pipeline

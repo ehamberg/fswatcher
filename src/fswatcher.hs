@@ -86,7 +86,7 @@ runWatch opt = do
   (pipelineThreads, outputMVar) <- runPipeline pipeline inputMVar
   runThread <- forkIO $ runCmd cmd args outputMVar
   stopWatcher <- watch filetype m canonicalPath inputMVar opt
-  
+
   let allThreads = runThread : pipelineThreads
 
   -- Calculate the full path in order to print the "real" file when watching a
