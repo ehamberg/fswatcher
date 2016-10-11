@@ -26,5 +26,5 @@ watchOpt = WatchOpt
                     <> value 0
                     <> metavar "MILLIS"
                     <> help "milliseconds to wait for duplicate events")
-     <*> (many . strArgument) (metavar "COMMAND"
+     <*> (some . strArgument) (metavar "COMMAND"
                       <> help "command to run" )
