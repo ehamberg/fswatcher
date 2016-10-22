@@ -11,6 +11,15 @@ before_install:
   - travis_retry curl -L https://www.stackage.org/stack/linux-x86_64 | tar xz --wildcards --strip-components=1 -C ~/.local/bin '*/stack'
   - chmod a+x ~/.local/bin/stack
 
+before_install:
+  - mkdir -p ~/.local/bin
+  - export PATH=~/.local/bin:$PATH
+  - travis_retry curl -L https://www.stackage.org/stack/linux-x86_64 | tar -xzO --wildcards '*/stack' > ~/.local/bin/stack
+  - chmod a+x ~/.local/bin/stack
+
 install:
-  - stack setup
-  - stack build
+  - stack -j2 setup --no-terminal
+  - stack -j2 build --only-snapshot --no-terminal
+
+script:
+  - stack -j2 build --no-terminal
