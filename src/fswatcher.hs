@@ -36,8 +36,9 @@ watch filetype m path trigger opt =
                    File      -> watchDir  m (encodeString $ directory $ decodeString path) isThisFile
    in watchFun (\_ -> void $ tryPutMVar trigger ())
 
-  where isThisFile (Modified p _) = p == fromString path
-        isThisFile _              = False
+  where isThisFile :: Event -> Bool
+        isThisFile (Modified p _ _) = p == fromString path
+        isThisFile _                = False
         matchFiles :: WatchOpt -> Event -> Bool
         matchFiles wo event = let p = eventPath event
                                   includes = includePath wo

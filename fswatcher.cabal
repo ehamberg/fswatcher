@@ -20,7 +20,7 @@ Executable fswatcher
     build-depends:   base            >= 4 && < 5
                    , unix            >= 2.5
                    , process         >= 1.1
-                   , fsnotify        >= 0.1
+                   , fsnotify        >= 0.3 && < 0.4
                    , system-filepath >= 0.4
                    , directory       >= 1.2
                    , optparse-applicative >= 0.11

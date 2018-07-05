@@ -1,7 +1,8 @@
 resolver: lts-7.4
 packages:
 - '.'
-extra-deps: []
+extra-deps:
+- fsnotify-0.3.0.1
 flags: {}
 
 
