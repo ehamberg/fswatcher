@@ -11,7 +11,7 @@ License-file:       LICENSE
 author:             Erlend Hamberg
 maintainer:         ehamberg@gmail.com
 stability:          experimental
-tested-with:        GHC==7.6.3
+tested-with:        GHC==7.6.3, GHC==8.4.4
 homepage:           http://www.github.com/ehamberg/fswatcher/
 cabal-version:      >= 1.6
 
