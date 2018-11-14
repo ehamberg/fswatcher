@@ -8,7 +8,7 @@
 
 `fswatcher` monitors a file or a directory for changes and runs a given command
 when the file is modified. If monitoring a directory, it runs the specified
-command a file within the given directory is modified.
+command when any file in the directory tree is modified.
 
 This is a really thin layer on top of the
 [fsnotify](http://hackage.haskell.org/package/fsnotify) library. It works on
