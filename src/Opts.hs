@@ -3,8 +3,8 @@ module Opts where
 import           Options.Applicative
 
 data WatchOpt = WatchOpt { watchPath   :: String
-                         , includePath :: String  -- ^ an reg exp to include particular files when watching dir
-                         , excludePath :: String  -- ^ an reg exp to exclude particular files when watching dir
+                         , includePath :: String  -- ^ a regex to include particular files when watching dir
+                         , excludePath :: String  -- ^ a regex to exclude particular files when watching dir
                          , throttlingDelay :: Int     -- ^ milliseconds to wait for duplicate events
                          , actionCmd   :: [String]
                          } deriving (Show)
