@@ -2,7 +2,7 @@ module Opts where
 
 import           Options.Applicative
 
-data WatchOpt = WatchOpt { watchPath   :: String
+data WatchOpt = WatchOpt { watchPaths  :: [String]
                          , includePath :: String  -- ^ a regex to include particular files when watching dir
                          , excludePath :: String  -- ^ a regex to exclude particular files when watching dir
                          , throttlingDelay :: Int     -- ^ milliseconds to wait for duplicate events
@@ -11,9 +11,9 @@ data WatchOpt = WatchOpt { watchPath   :: String
 
 watchOpt :: Parser WatchOpt
 watchOpt = WatchOpt
-     <$> strOption (long "path"
-                    <> metavar "PATH"
-                    <> help "directory / file to watch" )
+     <$> some (strOption (long "path"
+                          <> metavar "PATH"
+                          <> help "directory / file to watch" ))
      <*> strOption (long "include"
                     <> value []
                     <> metavar "INCLUDE"
