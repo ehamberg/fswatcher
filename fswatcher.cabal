@@ -9,11 +9,11 @@ description:        A simple program that watches a file or a directory and
 license:            BSD3
 License-file:       LICENSE
 author:             Erlend Hamberg
-maintainer:         ehamberg@gmail.com
+maintainer:         erlend@hamberg.no
 stability:          experimental
-tested-with:        GHC==8.4.4
+tested-with:        GHC==8.10.3
 homepage:           http://www.github.com/ehamberg/fswatcher/
-cabal-version:      >= 1.6
+cabal-version:      >= 1.10
 
 
 Executable fswatcher
@@ -26,10 +26,11 @@ Executable fswatcher
                    , optparse-applicative >= 0.11
                    , regex-pcre-builtin   >= 0.94
     ghc-options:     -Wall
-    hs-source-dirs:  src
-    main-is:         fswatcher.hs
-    other-modules:   Opts
-                   , Pipeline
+    hs-source-dirs:   src
+    main-is:          fswatcher.hs
+    default-language: Haskell2010
+    other-modules:    Opts
+                    , Pipeline
 
 source-repository head
   type:     git
