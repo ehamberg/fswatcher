@@ -11,13 +11,13 @@ License-file:       LICENSE
 author:             Erlend Hamberg
 maintainer:         ehamberg@gmail.com
 stability:          experimental
-tested-with:        GHC==7.6.3, GHC==8.4.4
+tested-with:        GHC==8.4.4
 homepage:           http://www.github.com/ehamberg/fswatcher/
 cabal-version:      >= 1.6
 
 
 Executable fswatcher
-    build-depends:   base            >= 4 && < 5
+    build-depends:   base            >= 4.11 && < 5
                    , unix            >= 2.5
                    , process         >= 1.1
                    , fsnotify        >= 0.3 && < 0.4
