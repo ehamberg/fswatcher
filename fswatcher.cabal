@@ -6,7 +6,7 @@ license-file:  LICENSE
 maintainer:    erlend@hamberg.no
 author:        Erlend Hamberg
 tested-with:   ghc ==9.4.7
-homepage:      http://www.github.com/ehamberg/fswatcher/
+homepage:      https://git.sr.ht/~ehamberg/fswatcher
 synopsis:      Watch a file/directory and run a command when it's modified
 description:
     A simple program that watches a file or a directory and
@@ -18,7 +18,7 @@ build-type:    Simple
 
 source-repository head
     type:     git
-    location: git://github.com/ehamberg/fswatcher.git
+    location: https://git.sr.ht/~ehamberg/fswatcher
 
 executable fswatcher
     main-is:          fswatcher.hs
