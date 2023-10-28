@@ -5,8 +5,7 @@ import Prelude hiding (id, (.))
 import System.IO (hPutStrLn, stderr)
 import System.Posix.Files (getFileStatus, isDirectory)
 import System.Directory (canonicalizePath, getCurrentDirectory)
-import Filesystem.Path ((</>), directory)
-import Filesystem.Path.CurrentOS (decodeString, encodeString)
+import System.FilePath (takeDirectory, (</>))
 import Data.Foldable (for_)
 import Data.String (fromString)
 import Data.Traversable (for)
@@ -41,7 +40,7 @@ watch m trigger opt fileDetails = do
   let path = expandedPath fileDetails
   let watchFun = case filetype fileDetails of
                    Directory -> watchTree m path (matchFiles opt)
-                   File      -> watchDir  m (encodeString $ directory $ decodeString path) isThisFile
+                   File      -> watchDir  m (takeDirectory path) isThisFile
    in watchFun (\_ -> void $ tryPutMVar trigger ())
 
   where isThisFile :: Event -> Bool
