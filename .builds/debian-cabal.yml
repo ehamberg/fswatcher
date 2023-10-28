@@ -1,0 +1,9 @@
+image: debian/stable
+packages:
+  - cabal-install
+  - ghc
+tasks:
+  - build: |
+      cd fswatcher
+      cabal update
+      cabal build

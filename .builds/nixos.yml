@@ -1,0 +1,18 @@
+image: nixos/unstable
+packages:
+  - nixos.nixUnstable
+environment:
+  NIX_CONFIG: "experimental-features = nix-command flakes"
+secrets:
+  # cachix token
+  - d307d709-ebdf-41fd-865a-deb08607ff3c
+sources:
+  - https://git.sr.ht/~ehamberg/fswatcher
+tasks:
+- setup_cachix: |
+    nix-env -iA cachix -f https://cachix.org/api/v1/install
+    cachix authtoken --stdin < ~/.cachix_token
+    cachix use ehamberg
+- build: |
+    cd fswatcher
+    cachix watch-exec ehamberg -- nix build --accept-flake-config --max-jobs 4

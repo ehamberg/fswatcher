@@ -3,7 +3,7 @@
                     |  _|_ -| | | | .'|  _|  _|   | -_|  _|
                     |_| |___|_____|__,|_| |___|_|_|___|_|
 
-[![Build Status](https://travis-ci.org/ehamberg/fswatcher.png)](https://travis-ci.org/ehamberg/fswatcher)
+[![builds.sr.ht status](https://builds.sr.ht/~ehamberg/fswatcher/commits/main/debian-cabal.yml.svg)](https://builds.sr.ht/~ehamberg/fswatcher/commits/main/debian-cabal.yml?)
 [![hackage release](https://img.shields.io/hackage/v/fswatcher.svg?label=hackage)](http://hackage.haskell.org/package/fswatcher)
 
 `fswatcher` monitors a file or a directory for changes and runs a given command
